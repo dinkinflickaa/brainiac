@@ -1,5 +1,7 @@
 # Brainiac
 
+**Live app:** https://dinkinflickaa.github.io/brainiac/ (on iPad: Safari, Share, Add to Home Screen)
+
 An iPad-first web app for a 2nd grader: CogAT-style puzzles, speed math tricks, and real-life prizes.
 Everything is read aloud, so a child can use it alone.
 
