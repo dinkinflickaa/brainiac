@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 /** Rounded white box used to frame pictures in questions and solutions. */
 export function Frame({
@@ -161,4 +161,36 @@ export function Row({ children, gap = 16, style, wrap }: { children: ReactNode; 
 /** Vertical stack with gap, centered. */
 export function Col({ children, gap = 12, style }: { children: ReactNode; gap?: number; style?: CSSProperties }) {
   return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap, ...style }}>{children}</div>;
+}
+
+/**
+ * Shrinks its content to fit the available width (never grows it).
+ * Lets every puzzle picture work on a phone without each one knowing the screen size.
+ */
+export function Fit({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+  const outer = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const [k, setK] = useState(1);
+  const [h, setH] = useState<number | undefined>(undefined);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const o = outer.current, i = inner.current;
+      if (!o || !i) return;
+      const natural = i.scrollWidth;
+      const avail = o.clientWidth;
+      const nk = natural > avail + 1 ? Math.max(0.3, avail / natural) : 1;
+      setK(nk);
+      setH(nk < 1 ? i.scrollHeight * nk : undefined);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (outer.current) ro.observe(outer.current);
+    if (inner.current) ro.observe(inner.current);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <div ref={outer} style={{ width: '100%', height: h, display: 'flex', alignItems: 'flex-start', justifyContent: k < 1 ? 'flex-start' : 'center', ...style }}>
+      <div ref={inner} style={{ width: 'max-content', flexShrink: 0, transform: k < 1 ? `scale(${k})` : undefined, transformOrigin: 'top left' }}>{children}</div>
+    </div>
+  );
 }

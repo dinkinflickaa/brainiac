@@ -43,7 +43,7 @@ export function NumberLine({ from, hops, played, width = 640, auto = false, ever
   for (let v = Math.ceil(min / step) * step; v <= max; v += step) ticks.push(v);
   const baseY = 110;
   return (
-    <svg viewBox={`0 0 ${width} ${H}`} width="100%" style={{ maxWidth: width, display: 'block', overflow: 'visible' }} role="img" aria-label={`number line from ${from}`}>
+    <svg viewBox={`0 0 ${width} ${H}`} width={width} style={{ display: 'block', overflow: 'visible' }} role="img" aria-label={`number line from ${from}`}>
       <line x1={10} y1={baseY} x2={width - 10} y2={baseY} stroke={INK} strokeWidth={3} strokeLinecap="round" />
       {ticks.map((t) => (
         <g key={t}>

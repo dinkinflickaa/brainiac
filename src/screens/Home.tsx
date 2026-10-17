@@ -97,7 +97,7 @@ export function Home() {
       </div>
 
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-        <div style={{ flex: '3 1 440px', background: 'var(--purple)', color: '#fff', borderRadius: 28, padding: '20px 26px', display: 'flex', alignItems: 'center', gap: 22 }}>
+        <div className="hero" style={{ flex: '3 1 440px', background: 'var(--purple)', color: '#fff', borderRadius: 28, padding: '20px 26px', display: 'flex', alignItems: 'center', gap: 22 }}>
           <Pip size={120} mood={doneToday ? 'cheer' : 'happy'} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div className="display" style={{ fontSize: 'clamp(30px, 5vh, 42px)', lineHeight: 1 }}>{greet}</div>

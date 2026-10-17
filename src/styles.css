@@ -67,6 +67,7 @@ button:focus-visible, a:focus-visible { outline: 4px solid var(--sun); outline-o
   gap: 10px;
   transition: transform 90ms ease, box-shadow 90ms ease, background 200ms;
 }
+.btn { white-space: nowrap; }
 .btn:active { transform: translateY(4px); box-shadow: none !important; }
 .btn-primary { background: var(--purple); color: #fff; box-shadow: 0 6px 0 var(--purple-dark); }
 .btn-sun { background: var(--sun); color: var(--ink); box-shadow: 0 6px 0 var(--sun-dark); }
@@ -130,4 +131,32 @@ button:focus-visible, a:focus-visible { outline: 4px solid var(--sun); outline-o
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+/* ---------- phones ---------- */
+.only-phone { display: none; }
+@media (max-width: 640px) {
+  .screen { padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); gap: 12px; }
+  .btn { font-size: 18px !important; min-height: 50px !important; padding: 0 16px !important; gap: 6px; }
+  .icon-btn { width: 48px; height: 48px; border-radius: 15px; }
+  .pill { font-size: 15px; padding: 6px 12px; }
+  .hide-phone { display: none !important; }
+  .only-phone { display: inline; }
+  /* puzzle screen: let the page scroll and keep the buttons in reach */
+  .play-main { flex: none !important; flex-direction: column !important; flex-wrap: nowrap !important; }
+  .play-stim { flex: none !important; overflow: visible !important; }
+  .play-bar { position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom, 0px)); background: var(--bg); padding: 8px 0 calc(10px + env(safe-area-inset-bottom, 0px)); margin-top: auto; z-index: 5; flex-wrap: wrap; }
+  .banner { flex-wrap: wrap; }
+  .banner .msg { flex: 1 1 60% !important; }
+  .banner .acts { display: flex; gap: 8px; flex: 1 1 100%; justify-content: flex-end; }
+  .choice { min-height: 76px !important; padding: 6px; border-radius: 16px; }
+  .choice-letter { font-size: 13px; top: 3px; left: 7px; }
+  .sol-controls { flex-wrap: wrap; }
+  .hero { flex-wrap: wrap; padding: 16px !important; gap: 12px !important; }
+  .hero > svg { width: 76px; height: 81px; }
+}
+.choice-grid { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+@media (max-width: 640px) {
+  .choice-grid.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .choice-grid.four .choice { min-height: 96px !important; }
 }

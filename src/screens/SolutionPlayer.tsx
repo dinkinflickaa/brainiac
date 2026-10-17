@@ -4,6 +4,7 @@ import { MOD, TRICKS } from '../content/registry';
 import { say, stopVoice } from '../audio/voice';
 import { sfx } from '../audio/sfx';
 import { Icon, Pip } from '../ui/parts';
+import { Fit } from '../ui/kit';
 import { spokenSteps } from '../speech/lines';
 
 /**
@@ -62,7 +63,7 @@ export function SolutionPlayer({ q, onClose, title = "Let's see how", closeLabel
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto' }}>
         <div key={q.id} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          <Sol q={q} step={step} />
+          <Fit><Sol q={q} step={step} /></Fit>
         </div>
       </div>
 
@@ -74,7 +75,7 @@ export function SolutionPlayer({ q, onClose, title = "Let's see how", closeLabel
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+      <div className="sol-controls" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
         <button className="icon-btn" aria-label="Previous step" onClick={() => go(step - 1)} disabled={step === 0}>{Icon.back()}</button>
         <button className="btn btn-white" style={{ minWidth: 140 }} onClick={() => { if (playing) { stopVoice(); setPlaying(false); } else if (finished && step === last) { go(0); setFinished(false); } else setPlaying(true); }}>
           {playing ? Icon.pause() : finished && step === last ? Icon.replay() : Icon.play()}

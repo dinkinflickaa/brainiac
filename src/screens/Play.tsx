@@ -11,6 +11,7 @@ import { spokenSteps } from '../speech/lines';
 import { sfx } from '../audio/sfx';
 import { useNav, type SessionSpec } from '../app/nav';
 import { Confetti, Icon, NumberPad, Pip, SpeakButton } from '../ui/parts';
+import { Fit } from '../ui/kit';
 import { SolutionPlayer } from './SolutionPlayer';
 import { LINES } from '../speech/lines';
 
@@ -237,8 +238,9 @@ export function Play({ spec }: { spec: SessionSpec }) {
       {/* top bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <button className="icon-btn" aria-label="Stop and go home" onClick={() => { stopVoice(); if (stats.current.answered > 0) touchStreak(); nav.back(); }}>{Icon.close()}</button>
-        <div style={{ background: world.soft, color: world.color, borderRadius: 999, padding: '6px 14px', fontWeight: 800, fontSize: 15, whiteSpace: 'nowrap' }}>{mod.name}</div>
-        <div style={{ flex: 1, display: 'flex', gap: 5, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div className="hide-phone" style={{ background: world.soft, color: world.color, borderRadius: 999, padding: '6px 14px', fontWeight: 800, fontSize: 15, whiteSpace: 'nowrap' }}>{mod.name}</div>
+        <div className="display only-phone" style={{ flex: 1, textAlign: 'center', fontSize: 18, color: 'var(--muted)' }}>{index + 1} / {spec.count}</div>
+        <div className="hide-phone" style={{ flex: 1, display: 'flex', gap: 5, justifyContent: 'center', flexWrap: 'wrap' }}>
           {dots.map((i) => <span key={i} style={{ width: spec.count > 12 ? 12 : 22, height: 10, borderRadius: 99, background: i < index ? 'var(--purple)' : i === index ? 'var(--sun)' : 'var(--line)' }} />)}
         </div>
         <div className="pill">{Icon.star(20)} {progress.stars}</div>
@@ -251,9 +253,9 @@ export function Play({ spec }: { spec: SessionSpec }) {
       </div>
 
       {/* main area */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: isNumber ? 'wrap' : 'nowrap', flexDirection: isNumber ? 'row' : 'column' }}>
-        <div style={{ flex: isNumber ? '999 1 420px' : 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto' }} className={wiggle && phase === 'wrong' ? 'wiggle' : ''} key={`stim${q.id}${wiggle}`}>
-          <Stim q={q} />
+      <div className="play-main" style={{ flex: 1, minHeight: 0, display: 'flex', gap: 20, alignItems: 'stretch', flexWrap: isNumber ? 'wrap' : 'nowrap', flexDirection: isNumber ? 'row' : 'column' }}>
+        <div style={{ flex: isNumber ? '999 1 420px' : 1, minHeight: 0, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto' }} className={`play-stim ${wiggle && phase === 'wrong' ? 'wiggle' : ''}`} key={`stim${q.id}${wiggle}`}>
+          <Fit><Stim q={q} /></Fit>
         </div>
 
         {isNumber ? (
@@ -261,7 +263,7 @@ export function Play({ spec }: { spec: SessionSpec }) {
             <NumberPad value={typed} onChange={setTyped} onSubmit={submit} maxDigits={q.answer.kind === 'number' ? q.answer.maxDigits : 3} disabled={phase === 'right' || (fast && phase === 'wrong')} />
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${choices.length}, minmax(0, 1fr))`, gap: 'clamp(8px, 1.5vw, 16px)', flexShrink: 0 }}>
+          <div className={choices.length > 3 ? "choice-grid four" : "choice-grid"} style={{ ["--n" as string]: choices.length, display: 'grid', gap: 'clamp(8px, 1.5vw, 16px)', flexShrink: 0 }}>
             {choices.map((c, i) => {
               const cls = ['choice'];
               if (picked === i && phase === 'ask') cls.push('selected');
@@ -273,7 +275,7 @@ export function Play({ spec }: { spec: SessionSpec }) {
                   onClick={() => { if (phase === 'wrong') tryAgain(); sfx.tap(); setPicked(i); }}
                   style={{ minHeight: 'clamp(96px, 16vh, 150px)' }}>
                   <span className="choice-letter">{LETTERS[i]}</span>
-                  {Choice ? <Choice q={q} data={c} index={i} /> : <span className="display" style={{ fontSize: 32 }}>{String(c)}</span>}
+                  <Fit>{Choice ? <Choice q={q} data={c} index={i} /> : <span className="display" style={{ fontSize: 32 }}>{String(c)}</span>}</Fit>
                 </button>
               );
             })}
@@ -290,42 +292,44 @@ export function Play({ spec }: { spec: SessionSpec }) {
       )}
 
       {/* bottom bar: helpers, feedback, check */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, minHeight: 64 }}>
+      <div className="play-bar" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, minHeight: 64 }}>
         {phase === 'ask' && !fast && (
           <>
             <button className="btn btn-white" onClick={openHint} style={{ fontSize: 20 }}><span style={{ color: '#9A6400', display: 'flex' }}>{Icon.bulb()}</span>Hint</button>
-            <button className="btn btn-soft" onClick={openTrick} style={{ fontSize: 20 }}>{Icon.book()}Learn the trick</button>
+            <button className="btn btn-soft" aria-label="Learn the trick" onClick={openTrick} style={{ fontSize: 20 }}>{Icon.book()}<span className="hide-phone">Learn the trick</span><span className="only-phone">Trick</span></button>
             <div style={{ flex: 1 }} />
             {!isNumber && <button className="btn btn-primary" disabled={picked === null} onClick={submit} style={{ minWidth: 160, fontSize: 26 }}>Check</button>}
           </>
         )}
         {phase === 'ask' && fast && <div style={{ flex: 1, textAlign: 'center', fontWeight: 800, color: 'var(--muted)' }}>{spec.mode === 'speed' ? 'Speed round: answer as fast as you can!' : 'Fact sprint: quick as you can!'}</div>}
         {phase === 'wrong' && (
-          <div className="fade-up" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '3px solid var(--orange)', borderRadius: 22, padding: '10px 14px' }}>
+          <div className="fade-up banner" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, background: '#fff', border: '3px solid var(--orange)', borderRadius: 22, padding: '10px 14px' }}>
             <Pip size={50} mood="think" />
-            <div style={{ flex: 1, fontWeight: 800, fontSize: 'clamp(16px, 2.6vh, 21px)', color: '#5C2800' }}>{message}</div>
+            <div className="msg" style={{ flex: 1, fontWeight: 800, fontSize: 'clamp(16px, 2.6vh, 21px)', color: '#5C2800' }}>{message}</div>
             {fast ? (
-              <>
+              <div className="acts" style={{ display: 'flex', gap: 10 }}>
                 <button className="btn btn-soft" onClick={openTrick} style={{ fontSize: 18 }}>{Icon.book()}Trick</button>
                 <button className="btn btn-primary" onClick={advance}>Next</button>
-              </>
+              </div>
             ) : tries === 1 ? (
-              <>
+              <div className="acts" style={{ display: 'flex', gap: 10 }}>
                 <button className="btn btn-white" onClick={tryAgain}>Try again</button>
                 <button className="btn btn-orange" onClick={showSolution}>Show me how</button>
-              </>
+              </div>
             ) : null}
           </div>
         )}
         {phase === 'right' && !fast && (
-          <div className="fade-up" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, background: 'var(--green)', color: '#fff', borderRadius: 22, padding: '10px 14px' }}>
+          <div className="fade-up banner" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, background: 'var(--green)', color: '#fff', borderRadius: 22, padding: '10px 14px' }}>
             <Pip size={54} mood="cheer" />
-            <div style={{ flex: 1 }}>
+            <div className="msg" style={{ flex: 1 }}>
               <div className="display" style={{ fontSize: 'clamp(22px, 3.6vh, 30px)', lineHeight: 1.1 }}>{message}</div>
               <div style={{ display: 'flex', gap: 2, marginTop: 2 }}>{Array.from({ length: tries === 0 && !helped && !guided ? 3 : 2 }).map((_, i) => <span key={i}>{Icon.star(22)}</span>)}</div>
             </div>
-            <button className="btn" style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', fontSize: 19 }} onClick={() => { stats.current.solutions++; sfx.tap(); setPhase('solution'); }}>See how</button>
-            <button className="btn btn-sun" onClick={advance} autoFocus>{index + 1 >= spec.count ? 'Finish' : 'Next'}</button>
+            <div className="acts" style={{ display: 'flex', gap: 10 }}>
+              <button className="btn" style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', fontSize: 19 }} onClick={() => { stats.current.solutions++; sfx.tap(); setPhase('solution'); }}>See how</button>
+              <button className="btn btn-sun" onClick={advance} autoFocus>{index + 1 >= spec.count ? 'Finish' : 'Next'}</button>
+            </div>
           </div>
         )}
       </div>
